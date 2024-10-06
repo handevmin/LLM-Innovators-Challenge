@@ -1,0 +1,1321 @@
+index.html
+```
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 인터뷰</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>
+```
+
+postcss.config.js
+```
+export default {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  }
+```
+
+tailwind.config.js
+```
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+    darkMode: ["class"],
+    content: [
+      './pages/**/*.{js,jsx}',
+      './components/**/*.{js,jsx}',
+      './app/**/*.{js,jsx}',
+      './src/**/*.{js,jsx}',
+    ],
+    theme: {
+      container: {
+        center: true,
+        padding: "2rem",
+        screens: {
+          "2xl": "1400px",
+        },
+      },
+      extend: {
+        colors: {
+          border: "hsl(var(--border))",
+          input: "hsl(var(--input))",
+          ring: "hsl(var(--ring))",
+          background: "hsl(var(--background))",
+          foreground: "hsl(var(--foreground))",
+          primary: {
+            DEFAULT: "hsl(var(--primary))",
+            foreground: "hsl(var(--primary-foreground))",
+          },
+          secondary: {
+            DEFAULT: "hsl(var(--secondary))",
+            foreground: "hsl(var(--secondary-foreground))",
+          },
+          destructive: {
+            DEFAULT: "hsl(var(--destructive))",
+            foreground: "hsl(var(--destructive-foreground))",
+          },
+          muted: {
+            DEFAULT: "hsl(var(--muted))",
+            foreground: "hsl(var(--muted-foreground))",
+          },
+          accent: {
+            DEFAULT: "hsl(var(--accent))",
+            foreground: "hsl(var(--accent-foreground))",
+          },
+          popover: {
+            DEFAULT: "hsl(var(--popover))",
+            foreground: "hsl(var(--popover-foreground))",
+          },
+          card: {
+            DEFAULT: "hsl(var(--card))",
+            foreground: "hsl(var(--card-foreground))",
+          },
+        },
+        borderRadius: {
+          lg: "var(--radius)",
+          md: "calc(var(--radius) - 2px)",
+          sm: "calc(var(--radius) - 4px)",
+        },
+        keyframes: {
+          "accordion-down": {
+            from: { height: 0 },
+            to: { height: "var(--radix-accordion-content-height)" },
+          },
+          "accordion-up": {
+            from: { height: "var(--radix-accordion-content-height)" },
+            to: { height: 0 },
+          },
+        },
+        animation: {
+          "accordion-down": "accordion-down 0.2s ease-out",
+          "accordion-up": "accordion-up 0.2s ease-out",
+        },
+      },
+    },
+    plugins: [require("tailwindcss-animate")],
+  }
+```
+
+vite.config.js
+```
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+  root: '.', // 루트 디렉토리 지정
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+  build: {
+    outDir: 'dist', // 빌드 출력 디렉토리 지정
+  },
+})
+```
+
+dist\index.html
+```
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 인터뷰</title>
+    <script type="module" crossorigin src="/assets/index-B93cySPH.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Yrsiitnu.css">
+  </head>
+  <body>
+    <div id="root"></div>
+
+  </body>
+</html>
+```
+
+src\App.jsx
+```
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import CareerInfoPage from './pages/CareerInfoPage';
+import TechStackPage from './pages/TechStackPage';
+import InterviewTypePage from './pages/InterviewTypePage';
+import InterviewAtmospherePage from './pages/InterviewAtmospherePage';
+import AIInterviewSession from './pages/AIInterviewSession';
+import AIFeedbackPage from './pages/AIFeedbackPage';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/career-info" element={<CareerInfoPage />} />
+        <Route path="/tech-stack" element={<TechStackPage />} />
+        <Route path="/interview-type" element={<InterviewTypePage />} />
+        <Route path="/interview-atmosphere" element={<InterviewAtmospherePage />} />
+        <Route path="/interview-session" element={<AIInterviewSession />} />
+        <Route path="/feedback" element={<AIFeedbackPage />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+```
+
+src\index.jsx
+```
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+```
+
+src\components\FileUpload.jsx
+```
+import React, { useState, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Button } from '@/components/ui/button';
+import { Upload, File, X } from 'lucide-react';
+
+const FileUpload = ({ onFileUpload }) => {
+  const [file, setFile] = useState(null);
+
+  const onDrop = useCallback((acceptedFiles) => {
+    if (acceptedFiles && acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+      onFileUpload(acceptedFiles[0]);
+    }
+  }, [onFileUpload]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
+    },
+    multiple: false
+  });
+
+  const removeFile = () => {
+    setFile(null);
+    onFileUpload(null);
+  };
+
+  return (
+    <div className="mt-4">
+      <label className="block text-lg font-bold text-gray-500 mb-2">
+        자기소개서 업로드
+      </label>
+      <div
+        {...getRootProps()}
+        className={`p-4 border-2 border-dashed rounded-md text-center cursor-pointer transition-colors ${
+          isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+        }`}
+      >
+        <input {...getInputProps()} />
+        {file ? (
+          <div className="flex items-center justify-between bg-gray-100 p-2 rounded">
+            <div className="flex items-center">
+              <File className="mr-2 h-5 w-5 text-blue-500" />
+              <span className="text-sm text-gray-700">{file.name}</span>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeFile();
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+            <p className="mt-2 text-sm text-gray-600">
+              파일을 드래그하여 업로드하거나 클릭하여 파일을 선택하세요
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              PDF, DOC, DOCX 파일 (최대 10MB)
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default FileUpload;
+```
+
+src\components\Layout.jsx
+```
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const Layout = ({ children, title }) => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 flex flex-col justify-center items-center">
+      <Card className="w-full max-w-2xl shadow-lg rounded-2xl overflow-hidden">
+        <CardHeader className="bg-blue-500 text-white py-6">
+          <CardTitle className="text-3xl font-bold text-center">{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="p-8">
+          {children}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Layout;
+```
+
+src\components\ui\button.jsx
+```
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "button"
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size, className }))}
+      ref={ref}
+      {...props}
+    />
+  )
+})
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+```
+
+src\components\ui\card.jsx
+```
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+const Card = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)}
+    {...props}
+  />
+))
+Card.displayName = "Card"
+
+const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+))
+CardHeader.displayName = "CardHeader"
+
+const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn("text-2xl font-semibold leading-none tracking-tight", className)}
+    {...props}
+  />
+))
+CardTitle.displayName = "CardTitle"
+
+const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+CardDescription.displayName = "CardDescription"
+
+const CardContent = React.forwardRef(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+))
+CardContent.displayName = "CardContent"
+
+const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+))
+CardFooter.displayName = "CardFooter"
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+```
+
+src\components\ui\checkbox.jsx
+```
+import * as React from "react"
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
+import { Check } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+const Checkbox = React.forwardRef(({ className, ...props }, ref) => (
+  <CheckboxPrimitive.Root
+    ref={ref}
+    className={cn(
+      "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+      className
+    )}
+    {...props}
+  >
+    <CheckboxPrimitive.Indicator className={cn("flex items-center justify-center text-current")}>
+      <Check className="h-4 w-4" />
+    </CheckboxPrimitive.Indicator>
+  </CheckboxPrimitive.Root>
+))
+Checkbox.displayName = CheckboxPrimitive.Root.displayName
+
+export { Checkbox }
+```
+
+src\components\ui\input.jsx
+```
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+const Input = React.forwardRef(({ className, type, ...props }, ref) => {
+  return (
+    <input
+      type={type}
+      className={cn(
+        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  )
+})
+Input.displayName = "Input"
+
+export { Input }
+```
+
+src\components\ui\tabs.jsx
+```
+import * as React from "react"
+import * as TabsPrimitive from "@radix-ui/react-tabs"
+import { cn } from "@/lib/utils"
+
+const Tabs = TabsPrimitive.Root
+
+const TabsList = React.forwardRef(({ className, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn(
+      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      className
+    )}
+    {...props}
+  />
+))
+TabsList.displayName = TabsPrimitive.List.displayName
+
+const TabsTrigger = React.forwardRef(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      className
+    )}
+    {...props}
+  />
+))
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
+
+const TabsContent = React.forwardRef(({ className, ...props }, ref) => (
+  <TabsPrimitive.Content
+    ref={ref}
+    className={cn(
+      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      className
+    )}
+    {...props}
+  />
+))
+TabsContent.displayName = TabsPrimitive.Content.displayName
+
+export { Tabs, TabsList, TabsTrigger, TabsContent }
+```
+
+src\components\ui\textarea.jsx
+```
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+const Textarea = React.forwardRef(({ className, ...props }, ref) => {
+  return (
+    <textarea
+      className={cn(
+        "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  )
+})
+Textarea.displayName = "Textarea"
+
+export { Textarea }
+```
+
+src\lib\utils.js
+```
+import { clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs) {
+  return twMerge(clsx(inputs))
+}
+```
+
+src\pages\AIFeedbackPage.jsx
+```
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Share2, RefreshCw } from 'lucide-react';
+import Layout from '@/components/Layout';
+
+const AIFeedbackPage = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("analysis");
+
+  const handleShare = () => {
+    console.log("Sharing results...");
+  };
+
+  const handleRetry = () => {
+    navigate('/');
+  };
+
+  return (
+    <Layout title="AI 분석 및 피드백">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 h-14">
+          <TabsTrigger value="analysis" className="text-lg py-3 h-12">분석</TabsTrigger>
+          <TabsTrigger value="script" className="text-lg py-3 h-12">스크립트</TabsTrigger>
+        </TabsList>
+        <TabsContent value="analysis">
+          <Card className="shadow-lg">
+            <CardHeader className="bg-blue-500 text-white">
+              <CardTitle className="text-2xl">면접 분석</CardTitle>
+              <CardDescription className="text-blue-100">AI가 분석한 당신의 면접 결과입니다.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              {['강점', '개선할 점', '추가사항'].map((section, index) => (
+                <div key={section} className={`mb-6 ${index !== 0 ? 'border-t pt-6' : ''}`}>
+                  <h3 className="font-semibold text-xl mb-3 text-blue-700">{section}</h3>
+                  <ul className="list-disc pl-5 space-y-2">
+                    {section === '강점' && [
+                      '명확한 의사소통 능력',
+                      '기술적 지식의 깊이',
+                      '열정과 적극성'
+                    ].map((item, i) => <li key={i} className="text-gray-700">{item}</li>)}
+                    {section === '개선할 점' && [
+                      '구체적인 예시 부족',
+                      '시간 관리 개선 필요',
+                      '비언어적 커뮤니케이션 향상'
+                    ].map((item, i) => <li key={i} className="text-gray-700">{item}</li>)}
+                    {section === '추가사항' && [
+                      '프로젝트 경험에 대해 더 자세히 설명하면 좋을 것 같습니다.'
+                    ].map((item, i) => <li key={i} className="text-gray-700">{item}</li>)}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="script">
+          <Card className="shadow-lg">
+            <CardHeader className="bg-indigo-500 text-white">
+              <CardTitle className="text-2xl">면접 스크립트</CardTitle>
+              <CardDescription className="text-indigo-100">면접 대화 내용의 전체 스크립트입니다.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              {[
+                { speaker: '면접관', content: '안녕하세요. 자기소개 부탁드립니다.' },
+                { speaker: '지원자', content: '안녕하세요. 저는 [이름]입니다. [간단한 자기소개]' },
+                { speaker: '면접관', content: '네, 감사합니다. 프로젝트 경험에 대해 말씀해 주세요.' },
+                { speaker: '지원자', content: '네, 제가 진행한 프로젝트는 [프로젝트 설명]' }
+              ].map((dialogue, index) => (
+                <div key={index} className="mb-4 flex items-start">
+                  <div className={`font-semibold mr-3 ${dialogue.speaker === '면접관' ? 'text-indigo-600' : 'text-green-600'}`}>
+                    {dialogue.speaker}:
+                  </div>
+                  <div className="flex-1">{dialogue.content}</div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
+      <div className="mt-8 flex justify-center space-x-6">
+        <Button onClick={handleShare} className="bg-green-500 hover:bg-green-600 text-white px-6 h-12 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1">
+          <Share2 className="mr-2 h-5 w-5" /> 결과 공유
+        </Button>
+        <Button onClick={handleRetry} className="bg-blue-500 hover:bg-blue-600 text-white px-6 h-12 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1">
+          <RefreshCw className="mr-2 h-5 w-5" /> 다시 하기
+        </Button>
+      </div>
+    </Layout>
+  );
+};
+
+export default AIFeedbackPage;
+```
+
+src\pages\AIInterviewSession.jsx
+```
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Mic, MicOff, MessageSquare, RefreshCw } from 'lucide-react';
+import Layout from '@/components/Layout';
+import { generateQuestion, submitAnswer } from '@/utils/api';
+
+const removeQuotes = (str) => {
+  return str.replace(/^['"]|['"]$/g, '');
+};
+
+const AIInterviewSession = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { userProfile, interviewSetup } = location.state || {};
+  const [isMicOn, setIsMicOn] = useState(false);
+  const [conversation, setConversation] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState('');
+  const [userAnswer, setUserAnswer] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [questionCount, setQuestionCount] = useState(0);
+  const [totalQuestions] = useState(interviewSetup?.num_questions || 3);
+  const [questionQueue, setQuestionQueue] = useState([]);
+  const [isInterviewComplete, setIsInterviewComplete] = useState(false);
+
+  const speechSynthesis = window.speechSynthesis;
+  const [isRecognitionActive, setIsRecognitionActive] = useState(false);
+  const speechRecognition = useRef(null);
+
+  useEffect(() => {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      speechRecognition.current = new SpeechRecognition();
+      speechRecognition.current.continuous = true;
+      speechRecognition.current.interimResults = true;
+      speechRecognition.current.lang = 'ko-KR';
+
+      speechRecognition.current.onstart = () => {
+        console.log('Speech recognition started');
+        setIsRecognitionActive(true);
+        setIsMicOn(true);
+      };
+
+      speechRecognition.current.onend = () => {
+        console.log('Speech recognition ended');
+        setIsRecognitionActive(false);
+        setIsMicOn(false);
+        setInterimTranscript('');
+      };
+
+      speechRecognition.current.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+        setError('음성 인식 중 오류가 발생했습니다.');
+        setIsRecognitionActive(false);
+        setIsMicOn(false);
+      };
+
+      speechRecognition.current.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+
+        console.log('Interim transcript:', interimTranscript);
+        console.log('Final transcript:', finalTranscript);
+
+        setInterimTranscript(interimTranscript);
+        if (finalTranscript) {
+          setUserAnswer(prev => prev + ' ' + finalTranscript);
+        }
+      };
+    } else {
+      console.error('Speech recognition not supported');
+      setError('이 브라우저는 음성 인식을 지원하지 않습니다.');
+    }
+
+    return () => {
+      if (speechRecognition.current) {
+        speechRecognition.current.abort();
+      }
+    };
+  }, []);
+
+  const speakQuestion = (text) => {
+    if (speechSynthesis) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      speechSynthesis.speak(utterance);
+    }
+  };
+
+  const getNextQuestion = useCallback(async () => {
+    if (questionCount >= totalQuestions || isInterviewComplete) return;
+    
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await generateQuestion(userProfile, interviewSetup);
+      if (response && response.질문) {
+        const cleanedQuestion = removeQuotes(response.질문);
+        setQuestionQueue(prev => [...prev, cleanedQuestion]);
+      } else {
+        throw new Error("질문을 생성하지 못했습니다.");
+      }
+    } catch (error) {
+      console.error('Error generating question:', error);
+      setError("질문 생성에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userProfile, interviewSetup, questionCount, totalQuestions, isInterviewComplete]);
+
+  useEffect(() => {
+    if (questionQueue.length === 0 && questionCount < totalQuestions && !isInterviewComplete) {
+      getNextQuestion();
+    } else if (questionQueue.length > 0 && !currentQuestion && !isInterviewComplete) {
+      const nextQuestion = questionQueue[0];
+      setCurrentQuestion(nextQuestion);
+      setConversation(prev => [...prev, { speaker: "AI", message: nextQuestion }]);
+      setQuestionQueue(prev => prev.slice(1));
+      setQuestionCount(prev => prev + 1);
+      speakQuestion(nextQuestion);
+    }
+  }, [questionQueue, currentQuestion, questionCount, totalQuestions, getNextQuestion, isInterviewComplete]);
+
+  const handleSubmitAnswer = async () => {
+    if (!userAnswer || isInterviewComplete) return;
+
+    setConversation(prev => [...prev, { speaker: "사용자", message: userAnswer }]);
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await submitAnswer(userAnswer, currentQuestion);
+      if (response && response.피드백) {
+        const cleanedFeedback = removeQuotes(response.피드백);
+        setConversation(prev => [...prev, { speaker: "AI", message: cleanedFeedback }]);
+        setUserAnswer('');
+        setCurrentQuestion('');
+        if (questionCount >= totalQuestions) {
+          setIsInterviewComplete(true);
+          setConversation(prev => [...prev, { speaker: "AI", message: "면접이 종료되었습니다. 피드백을 확인해 주세요." }]);
+        }
+      } else {
+        throw new Error("피드백을 생성하지 못했습니다.");
+      }
+    } catch (error) {
+      console.error('Error submitting answer:', error);
+      setError("답변 제출에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleMic = () => {
+    if (isRecognitionActive) {
+      speechRecognition.current.stop();
+    } else {
+      try {
+        setInterimTranscript('');
+        speechRecognition.current.start();
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+        setError('음성 인식을 시작하는 데 문제가 발생했습니다.');
+      }
+    }
+  };
+
+  const handleFeedback = () => {
+    navigate('/feedback', { state: { conversation } });
+  };
+
+  return (
+    <Layout title="AI 면접 세션">
+      <div className="flex flex-col items-center space-y-6">
+        <div className="w-32 h-32 bg-white rounded-full overflow-hidden shadow-lg">
+          <img 
+            src="https://cdn.usegalileo.ai/sdxl10/3e399f07-218b-4019-9de7-0ffe32f84f67.png" 
+            alt="AI Interviewer" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <Card className="w-full shadow-lg">
+          <CardContent className="p-4">
+            <div className="mb-4 text-center">
+              <span className="font-bold">질문 {questionCount}/{totalQuestions}</span>
+            </div>
+            <div className="h-64 overflow-y-auto bg-white rounded-lg p-4">
+              {conversation.map((entry, index) => (
+                <div key={index} className={`mb-4 flex ${entry.speaker === "AI" ? "justify-start" : "justify-end"}`}>
+                  <span className={`inline-block px-4 py-2 rounded-lg max-w-[70%] ${
+                    entry.speaker === "AI" 
+                      ? "bg-blue-100 text-blue-800" 
+                      : "bg-green-100 text-green-800"
+                  }`}>
+                    {entry.message}
+                  </span>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="text-center text-gray-500">
+                  <RefreshCw className="animate-spin inline-block mr-2" />
+                  처리 중...
+                </div>
+              )}
+              {error && (
+                <div className="text-center text-red-500">
+                  {error}
+                </div>
+              )}
+            </div>
+            <textarea
+              value={userAnswer}
+              onChange={(e) => setUserAnswer(e.target.value)}
+              placeholder="답변을 입력하세요"
+              className="w-full mt-4 p-2 border rounded"
+              disabled={isLoading || isInterviewComplete}
+            />
+            {isMicOn && interimTranscript && (
+              <div className="mt-2 p-2 bg-gray-100 rounded">
+                음성 인식 중: {interimTranscript}
+              </div>
+            )}
+            <Button 
+              onClick={handleSubmitAnswer} 
+              className="mt-2" 
+              disabled={isLoading || !userAnswer || isInterviewComplete}
+            >
+              답변 제출
+            </Button>
+          </CardContent>
+        </Card>
+        <div className="flex justify-center space-x-6">
+          <Button 
+          onClick={toggleMic} 
+          className={`rounded-full w-16 h-16 flex items-center justify-center shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 ${
+            isMicOn ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
+          }`}
+          disabled={isLoading || isInterviewComplete}
+        >
+          {isMicOn ? <MicOff size={28} /> : <Mic size={28} />}
+        </Button>
+          <Button 
+            onClick={handleFeedback} 
+            className="bg-blue-500 hover:bg-blue-600 px-6 h-16 text-lg flex items-center justify-center space-x-3 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1"
+            disabled={!isInterviewComplete || isLoading}
+          >
+            <MessageSquare size={28} />
+            <span>피드백 보러가기</span>
+          </Button>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default AIInterviewSession;
+```
+
+src\pages\CareerInfoPage.jsx
+```
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { ChevronRight } from 'lucide-react';
+import FileUpload from '@/components/FileUpload';
+import Layout from '@/components/Layout';
+import { startInterview } from '@/utils/api';
+
+const CareerInfoPage = () => {
+  const navigate = useNavigate();
+  const [targetCompany, setTargetCompany] = useState('');
+  const [careerHistory, setCareerHistory] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const userProfile = {
+        profile: careerHistory,
+        company_name: targetCompany,
+        job_interest: "To be filled in next page" // TechStackPage에서 업데이트
+      };
+      await startInterview(userProfile);
+      navigate('/tech-stack', { state: { userProfile } });
+    } catch (error) {
+      console.error('Error starting interview:', error);
+    }
+  };
+
+  const handleFileUpload = (file) => {
+    setResumeFile(file);
+  };
+
+  return (
+    <Layout title="목표 기업 및 경력사항 입력">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="targetCompany" className="block text-lg font-bold text-gray-500 mb-1">
+            목표기업
+          </label>
+          <Input
+            id="targetCompany"
+            value={targetCompany}
+            onChange={(e) => setTargetCompany(e.target.value)}
+            placeholder="지원하고자 하는 기업명을 입력하세요"
+            className="w-full p-2 border rounded-md"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="careerHistory" className="block text-lg font-bold text-gray-500 mb-1">
+            경력사항
+          </label>
+          <Textarea
+            id="careerHistory"
+            value={careerHistory}
+            onChange={(e) => setCareerHistory(e.target.value)}
+            placeholder="관련 경력사항을 입력하세요. 신입의 경우 프로젝트 경험 등을 작성해 주세요."
+            rows={5}
+            className="w-full p-2 border rounded-md"
+            required
+          />
+        </div>
+        <FileUpload onFileUpload={handleFileUpload} />
+        <Button 
+          type="submit" 
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 flex items-center justify-center"
+        >
+          다음 <ChevronRight className="ml-2" size={20} />
+        </Button>
+      </form>
+    </Layout>
+  );
+};
+
+export default CareerInfoPage;
+```
+
+src\pages\InterviewAtmospherePage.jsx
+```
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from 'lucide-react';
+import { setupInterview } from '@/utils/api';
+
+const InterviewAtmospherePage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { userProfile, interviewSetup } = location.state || {};
+
+  const atmosphereTypes = [
+    {
+      title: "일반 면접",
+      description: "표준적인 면접 분위기로 진행됩니다.",
+      image: "https://cdn.usegalileo.ai/sdxl10/fa7690a8-e5cc-48f2-b866-dd47a6cdab3d.png",
+    },
+    {
+      title: "압박 면접",
+      description: "압박 면접 상황에서의 대처 능력을 평가합니다.",
+      image: "https://cdn.usegalileo.ai/sdxl10/4207f057-7b9f-4264-9cc0-fc1358b5c0e0.png",
+    },
+    {
+      title: "편안한 면접",
+      description: "편안한 분위기에서 진행됩니다.",
+      image: "https://cdn.usegalileo.ai/sdxl10/35b3a66c-9183-483d-a799-60566c1861a6.png",
+    }
+  ];
+
+  const handleSelectAtmosphere = async (atmosphere) => {
+    try {
+      const fullSetup = {
+        ...interviewSetup,
+        interview_atmosphere: atmosphere,
+        num_questions: 3
+      };
+      await setupInterview(fullSetup);
+      navigate('/interview-session', { state: { userProfile, interviewSetup: fullSetup } });
+    } catch (error) {
+      console.error('Error setting up interview:', error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 flex flex-col justify-center items-center">
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-blue-500 text-white py-6">
+          <h1 className="text-3xl font-bold text-center">면접 분위기 선택</h1>
+        </div>
+        <div className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {atmosphereTypes.map((type, index) => (
+              <Card key={index} className="flex flex-col overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src={type.image} alt={type.title} className="w-full h-48 object-cover" />
+                <CardContent className="flex-grow p-4">
+                  <h2 className="text-xl font-semibold text-blue-600 mb-2">{type.title}</h2>
+                  <p className="text-gray-600 text-sm">{type.description}</p>
+                </CardContent>
+                <CardFooter className="p-4 pt-0">
+                  <Button 
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 flex items-center justify-center"
+                    onClick={() => handleSelectAtmosphere(type.title)}
+                  >
+                    선택 <ChevronRight className="ml-2" size={16} />
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InterviewAtmospherePage;
+```
+
+src\pages\InterviewTypePage.jsx
+```
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { ChevronRight } from 'lucide-react';
+
+const InterviewTypePage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const userProfile = location.state?.userProfile || {};
+
+  const interviewTypes = [
+    {
+      title: "기술 면접",
+      description: "기술적 지식과 문제 해결 능력을 평가합니다.",
+      image: "https://cdn.usegalileo.ai/sdxl10/624ef548-e7a6-4b12-9e29-1d248db44e1b.png",
+    },
+    {
+      title: "인성 면접",
+      description: "개인의 성격, 가치관, 팀워크 능력을 평가합니다.",
+      image: "https://cdn.usegalileo.ai/sdxl10/c4cc1182-3262-43d0-9041-f45a8dfc329c.png",
+    },
+    {
+      title: "자기소개서 기반 면접",
+      description: "제출한 자기소개서를 바탕으로 질문합니다.",
+      image: "https://cdn.usegalileo.ai/sdxl10/1ae134f8-c5ed-45d4-b720-87f4c201c0f1.png",
+    }
+  ];
+
+  const handleSelectType = (type) => {
+    navigate('/interview-atmosphere', { 
+      state: { 
+        userProfile,
+        interviewSetup: { interview_type: type }
+      } 
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6 flex flex-col justify-center items-center">
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-blue-500 text-white py-6">
+          <h1 className="text-3xl font-bold text-center">면접 유형 선택</h1>
+        </div>
+        <div className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {interviewTypes.map((type, index) => (
+              <Card key={index} className="flex flex-col overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src={type.image} alt={type.title} className="w-full h-48 object-cover" />
+                <CardContent className="flex-grow p-4">
+                  <h2 className="text-xl font-semibold text-blue-600 mb-2">{type.title}</h2>
+                  <p className="text-gray-600 text-sm">{type.description}</p>
+                </CardContent>
+                <CardFooter className="p-4 pt-0">
+                  <Button 
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 flex items-center justify-center"
+                    onClick={() => handleSelectType(type.title)}
+                  >
+                    선택 <ChevronRight className="ml-2" size={16} />
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InterviewTypePage;
+```
+
+src\pages\LandingPage.jsx
+```
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronRight } from 'lucide-react';
+
+const LandingPage = () => {
+  const navigate = useNavigate();
+
+  const handleStart = () => {
+    navigate('/career-info');
+  };
+
+  return (
+    <div className="min-h-screen bg-blue-50 p-6 flex flex-col items-center justify-center">
+      <Card className="w-full max-w-3xl bg-white rounded-3xl shadow-lg overflow-hidden">
+        <div className="bg-blue-500 text-white py-8 px-10">
+          <h1 className="text-4xl font-bold text-center">A-in</h1>
+        </div>
+        <CardContent className="p-10">
+          <div className="bg-blue-500 text-white p-8 rounded-2xl mb-8">
+            <h2 className="text-3xl font-bold mb-3">A-in AI 인터뷰</h2>
+            <p className="text-lg">IT 취업 준비생을 위한 맞춤형 면접 시뮬레이션</p>
+          </div>
+          
+          <h3 className="text-2xl font-semibold text-blue-700 mb-6">서비스 소개</h3>
+          <ul className="space-y-4 mb-8">
+            {[
+              "AI 기반 맞춤형 면접 연습",
+              "기술면접, 인성면접, 자기소개서 기반 면접 지원",
+              "실시간 AI 캐릭터와의 대화형 면접",
+              "상세한 피드백과 개선점 분석",
+              "다양한 면접 분위기 선택 가능"
+            ].map((item, index) => (
+              <li key={index} className="flex items-center text-gray-700">
+                <ChevronRight className="mr-3 h-6 w-6 text-blue-500 flex-shrink-0" />
+                <span className="text-lg">{item}</span>
+              </li>
+            ))}
+          </ul>
+          <Button 
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 flex items-center justify-center text-xl"
+            onClick={handleStart}
+          >
+            시작하기 <ChevronRight className="ml-2" size={24} />
+          </Button>
+        </CardContent>
+      </Card>
+      
+      <footer className="mt-8 text-center text-gray-600 text-base">
+        © 2024 A-in. All rights reserved.
+      </footer>
+    </div>
+  );
+};
+
+export default LandingPage;
+```
+
+src\pages\TechStackPage.jsx
+```
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
+import Layout from '@/components/Layout';
+
+const TechStackPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedTechs, setSelectedTechs] = useState([]);
+  const userProfile = location.state?.userProfile || {};
+
+  const techStacks = {
+    'Frontend': ['React', 'Angular', 'Vue.js', 'Next.js', 'Svelte'],
+    'Backend': ['Node.js', 'Python', 'Java', 'Spring', 'Django', 'Express'],
+    'Database': ['MySQL', 'PostgreSQL', 'MongoDB', 'Redis'],
+    'DevOps': ['Docker', 'Kubernetes', 'Jenkins', 'GitLab CI'],
+    'Cloud': ['AWS', 'Azure', 'Google Cloud'],
+    'AI/ML': ['TensorFlow', 'PyTorch', 'Scikit-learn']
+  };
+
+  const handleTechChange = (tech) => {
+    setSelectedTechs(prev => 
+      prev.includes(tech) ? prev.filter(t => t !== tech) : [...prev, tech]
+    );
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const updatedUserProfile = {
+      ...userProfile,
+      job_interest: selectedTechs.join(', ')
+    };
+    navigate('/interview-type', { state: { userProfile: updatedUserProfile } });
+  };
+
+  return (
+    <Layout title="기술 스택 선택">
+      <form onSubmit={handleSubmit}>
+        {Object.entries(techStacks).map(([category, techs]) => (
+          <div key={category} className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-600 mb-3">{category}</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {techs.map(tech => (
+                <Button
+                  key={tech}
+                  type="button"
+                  variant={selectedTechs.includes(tech) ? "default" : "outline"}
+                  onClick={() => handleTechChange(tech)}
+                  className={`w-full transition-all text-base font-bold text-gray-400 duration-200 ${
+                    selectedTechs.includes(tech) 
+                      ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                      : 'bg-white hover:bg-blue-100'
+                  }`}
+                >
+                  {tech}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ))}
+        <Button 
+          type="submit" 
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-full shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 flex items-center justify-center mt-6"
+        >
+          다음 <ChevronRight className="ml-2" size={20} />
+        </Button>
+      </form>
+    </Layout>
+  );
+};
+
+export default TechStackPage;
+```
+
+src\utils\api.js
+```
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://a-in-5308aa58f6cb.herokuapp.com';
+
+export const startInterview = async (userProfile) => {
+  try {
+    const response = await axios.post(`${API_URL}/start-interview`, userProfile);
+    return response.data;
+  } catch (error) {
+    console.error('Error starting interview:', error);
+    throw error;
+  }
+};
+
+export const setupInterview = async (setup) => {
+  try {
+    const response = await axios.post(`${API_URL}/setup-interview`, setup);
+    return response.data;
+  } catch (error) {
+    console.error('Error setting up interview:', error);
+    throw error;
+  }
+};
+
+export const generateQuestion = async (userProfile, setup) => {
+    try {
+      const response = await axios.post(`${API_URL}/generate-question`, { user_profile: userProfile, setup });
+      return response.data;
+    } catch (error) {
+      console.error('Error generating question:', error);
+      throw error;
+    }
+  };
+  
+  export const submitAnswer = async (answer, question) => {
+    try {
+      const response = await axios.post(`${API_URL}/submit-answer`, { answer, question });
+      return response.data;
+    } catch (error) {
+      console.error('Error submitting answer:', error);
+      throw error;
+    }
+  };
+```
+
